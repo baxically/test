@@ -21,7 +21,7 @@
 #include <time.h>
 #include <cmath>
 #include <functional>
-#include <iterator>
+#include <iterator> 
 #include <iterator>
 #include <time.h>
 #include "stdc++.h"
@@ -73,7 +73,7 @@ int main()
     vector<vector<int> > CH;
     vector<vector<int> > sampleHV;
     vector<vector<int> > nOne;
-    vector<int> classes(numTrainSamples + 1);
+    vector<int> classes(60001);
     vector<int> L;
     vector<int> rowArray(numFeatures);
     vector<int> nAlter(D);
@@ -103,7 +103,7 @@ int main()
     //CSV Format: label, pix-11, pix-12, pix-13, ...
     cout << "loading data..." << endl;
     time_t begin_L, end_L;
-    time(&begin_L);
+    time(&begin_L); 
     fin.open("mnist_train.csv");
     if(!fin.is_open())
     {
@@ -123,7 +123,7 @@ int main()
             //fin.ignore(50000000, '\n');
             trainset_array.push_back(rowArray);
             
-            for(int col = 0; col < 784; col++)
+            for(int col = 0; col < numFeatures; col++)
             {
                 fin.ignore(50000000, ',');
                 fin >> trainset_array[row][col];
@@ -175,7 +175,7 @@ int main()
         for(int k_ = 0; k_ <numAlter; k_++)
         {
           kalter = nAlter[(i_ - 1)*numAlter + k_];
-          LD[i_][kalter]=int(LD[i_][kalter]==0);
+          LD[i_][kalter]=int(LD[i_][kalter]==0);         
         }
     }
     
@@ -229,7 +229,7 @@ int main()
     int qcheck;
     int indMin=0;
     int i;
-    for(int iSam = 0; iSam < 1000; iSam++)
+    for(int iSam = 0; iSam < 100; iSam++)
     {
         
         for(int jSam = 0; jSam < numFeatures; jSam++)
@@ -237,20 +237,20 @@ int main()
             indMin=0;
             quantMin = abs(trainset_array[iSam][jSam]-L[0]);
             for (i=1; i<M;i++)
-            {
+            { 
               qcheck=abs(trainset_array[iSam][jSam]-L[i]);
               if (quantMin > qcheck)
               {
                 quantMin=qcheck;
                 indMin=i;
               }
-            }
+            }   
                    
             transform(LD[indMin].begin(), LD[indMin].end(), ID[jSam].begin(), sXorHV.begin(), bit_xor<int>());
             transform (sHV.begin(), sHV.end(), sXorHV.begin(), sHV.begin(), plus<int>());
         }
          
-        for(int jD = 0; jD < D; jD++)
+        for(int jD = 0; jD < D; jD++)   
         {
           sHV[jD]=int(sHV[jD] >= (numFeatures / 2));
         }
@@ -344,7 +344,7 @@ int main()
             indMin=0;
             quantMin = abs(testset_array[iTest][jTest]-L[0]);
             for (i=1; i<M;i++)
-            {
+            { 
               qcheck=abs(testset_array[iTest][jTest]-L[i]);
               if (quantMin > qcheck)
               {
@@ -359,7 +359,7 @@ int main()
             transform (qHV.begin(), qHV.end(), qXorHV.begin(), qHV.begin(), plus<int>());
         }
          
-        for(int jD = 0; jD < D; jD++)
+        for(int jD = 0; jD < D; jD++)   
         {
           if(qHV[jD] >= (numFeatures / 2))
           {
@@ -368,7 +368,7 @@ int main()
           else
           {
             qHV[jD] = 0;
-          }
+          } 
         }
         int testIndex = 0;
         transform(qHV.begin(), qHV.end(), classHV[0].begin(), qXorHV.begin(), bit_xor<int>());
@@ -382,7 +382,7 @@ int main()
             {
               testIndex = c;
               minResult=qResult[c];
-            }
+            }    
         }
         predicted[iTest] = classes.at(testIndex);
         if(predicted[iTest] == testset_labels.at(iTest))
@@ -398,7 +398,7 @@ int main()
     cout <<"Testing time="<<end_Test-begin_Test<<"seconds"<<endl;
     cout <<"Total Execution time="<<end_Test-begin_L<<"seconds"<<endl;
     
-    return 0;
+    return 0;  
 }
     
 vector<int> linspace(int start_in, int end_in, int num_in)
