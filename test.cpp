@@ -56,7 +56,7 @@ int main()
     int numTrainSamples = 60000;
     int numTestSamples = 10000;
     int numClasses = 10;
-    int numFeatures = 784;
+    int numFeatures;
     //int sampleLevel = 0;
     //int indexLevel = 0;
     int accuracy = 0;
@@ -64,9 +64,9 @@ int main()
     ifstream fin;
     ofstream fout;
     vector<vector<int> > trainset_array;
-    vector<int> trainset_labels(numTrainSamples + 1);
+    vector<int> trainset_labels(60001);
     vector<vector<int> > testset_array;
-    vector<int> testset_labels(numTestSamples + 1);
+    vector<int> testset_labels(10001);
     vector<int> labels(10,0);
     vector<vector<int> > LD;
     vector<vector<int> > ID;
@@ -75,7 +75,7 @@ int main()
     vector<vector<int> > nOne;
     vector<int> classes(60001);
     vector<int> L;
-    vector<int> rowArray(numFeatures);
+    vector<int> rowArray(784);
     vector<int> nAlter(D);
     vector<vector<int> > quantLevel;
     vector<vector<int> > quant;
@@ -123,7 +123,7 @@ int main()
             //fin.ignore(50000000, '\n');
             trainset_array.push_back(rowArray);
             
-            for(int col = 0; col < numFeatures; col++)
+            for(int col = 0; col < 784; col++)
             {
                 fin.ignore(50000000, ',');
                 fin >> trainset_array[row][col];
@@ -229,7 +229,7 @@ int main()
     int qcheck;
     int indMin=0;
     int i;
-    for(int iSam = 0; iSam < 100; iSam++)
+    for(int iSam = 0; iSam < numTrainSamples; iSam++)
     {
         
         for(int jSam = 0; jSam < numFeatures; jSam++)
@@ -321,7 +321,7 @@ int main()
             //fin.ignore(50000000, '\n');
             testset_array.push_back(rowArray);
             
-            for(int col = 0; col < numFeatures; col++)
+            for(int col = 0; col < 784; col++)
             {
                 fin.ignore(50000000, ',');
                 fin >> testset_array[row][col];
