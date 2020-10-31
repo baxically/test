@@ -56,12 +56,13 @@ int main()
     int numTrainSamples = 60000;
     int numTestSamples = 10000;
     int numClasses = 10;
-    int numFeatures;
+    int numFeatures=784;
     //int sampleLevel = 0;
     //int indexLevel = 0;
     int accuracy = 0;
     //char comma;
     ifstream fin;
+    ifstream ftestin;
     ofstream fout;
     vector<vector<int> > trainset_array;
     vector<int> trainset_labels(60001);
@@ -75,7 +76,7 @@ int main()
     vector<vector<int> > nOne;
     vector<int> classes(60001);
     vector<int> L;
-    vector<int> rowArray(784);
+    vector<int> rowArray(numFeatures);
     vector<int> nAlter(D);
     vector<vector<int> > quantLevel;
     vector<vector<int> > quant;
@@ -123,7 +124,7 @@ int main()
             //fin.ignore(50000000, '\n');
             trainset_array.push_back(rowArray);
             
-            for(int col = 0; col < 784; col++)
+            for(int col = 0; col < numFeatures; col++)
             {
                 fin.ignore(50000000, ',');
                 fin >> trainset_array[row][col];
@@ -132,6 +133,42 @@ int main()
             row++;
         }
     }
+    fin.close();
+    
+    int trow = 0;
+    cout<< "loading test data "<<endl;
+    fin.open("mnist_test.csv");
+    if(!fin.is_open())
+    {
+        cout << "Error: Can't open " + testCSV << endl;
+    }
+    else
+    {
+        while(!fin.eof())
+        {
+            
+            if(trow > numTestSamples)
+            {
+                break;
+            }
+            
+            fin >> testset_labels.at(trow);
+            //cout<< "\n"<<testset_labels[trow] << endl;
+            //fin.ignore(50000000, '\n');
+            testset_array.push_back(rowArray);
+            
+            for(int col = 0; col < numFeatures; col++)
+            {
+                fin.ignore(50000000, ',');
+                fin >> testset_array[trow][col];
+                //cout<< testset_array[trow][col];
+            }
+            trow++;
+        }
+    }
+    fin.close();
+
+    
     
     time(&end_L);
     cout <<"loading time="<<end_L-begin_L<<"seconds"<<endl;
@@ -279,7 +316,6 @@ int main()
 
         }
     }
-    fin.close();
     
         //test to see if ClassHV is being populated properly;
     
@@ -300,36 +336,7 @@ int main()
     
     time_t begin_Test, end_Test;
     time(&begin_Test);
-    
-    row = 0;
-    fin.open("mnist_test.csv");
-    if(!fin.is_open())
-    {
-        cout << "Error: Can't open " + testCSV << endl;
-    }
-    else
-    {
-        while(!fin.eof())
-        {
-            
-            if(row > numTestSamples)
-            {
-                break;
-            }
-            
-            fin >> testset_labels.at(row);
-            //fin.ignore(50000000, '\n');
-            testset_array.push_back(rowArray);
-            
-            for(int col = 0; col < 784; col++)
-            {
-                fin.ignore(50000000, ',');
-                fin >> testset_array[row][col];
-                //cout << trainset_array[row][col] << " ";
-            }
-            row++;
-        }
-    }
+
     
     vector<int> predicted(numTestSamples); //predicted class vector
     
@@ -361,14 +368,7 @@ int main()
          
         for(int jD = 0; jD < D; jD++)   
         {
-          if(qHV[jD] >= (numFeatures / 2))
-          {
-            qHV[jD] = 1;
-          }
-          else
-          {
-            qHV[jD] = 0;
-          } 
+          qHV[jD]=int(qHV[jD] >= (numFeatures / 2)); 
         }
         int testIndex = 0;
         transform(qHV.begin(), qHV.end(), classHV[0].begin(), qXorHV.begin(), bit_xor<int>());
@@ -385,11 +385,12 @@ int main()
             }    
         }
         predicted[iTest] = classes.at(testIndex);
-        if(predicted[iTest] == testset_labels.at(iTest))
+        if(predicted[iTest] == testset_labels[iTest])
         {
-          accuracy += 1;
+          accuracy =accuracy+ 1;
         }
         cout<<accuracy/(iTest+1)<<endl;
+        cout<<"predicted:"<<predicted[iTest]<<"\tActual:"<<testset_labels[iTest]<<endl;
     }
     accuracy = (accuracy / numTestSamples)*100;
     cout << "accuracy: " << accuracy <<"%"<< endl;
