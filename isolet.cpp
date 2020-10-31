@@ -24,6 +24,8 @@
 #include <iterator>
 #include <iterator>
 #include <time.h>
+#include <chrono>
+#include <ctime>
 #include "stdc++.h"
 
 using namespace std;
@@ -38,7 +40,8 @@ vector<int> elementWiseMulti(vector<vector<int> > v1, vector<vector<int> > v2);
 
 int main()
 {
-    //auto start = chrono::steady_clock::now();
+    chrono::time_point<chrono::system_clock> start, end;
+    start = chrono::system_clock::now();
     
     //variables
     string trainCSV = "isolet1+2+3+4.data";
@@ -103,9 +106,9 @@ int main()
     
     //loading data
     //CSV Format: label, pix-11, pix-12, pix-13, ...
+    chrono::time_point<chrono::system_clock> loadStart, loadEnd;
+    loadStart = chrono::system_clock::now();
     cout << "loading data..." << endl;
-    time_t begin_L, end_L;
-    time(&begin_L);
     fin.open("isolet1+2+3+4.data");
     if(!fin.is_open())
     {
@@ -172,14 +175,13 @@ int main()
     }
     fin.close();
 
+    loadEnd = chrono::system_clock::now();
+    chrono::duration<double> elapsedLoad = loadEnd - loadStart;
+    cout <<"loading time="<<elapsedLoad.count()<<"seconds"<<endl;
     
-    
-    time(&end_L);
-    cout <<"loading time="<<end_L-begin_L<<"seconds"<<endl;
-    
-    time_t begin_HV, end_HV;
-    time(&begin_HV);
-        //creating level hypervector
+    //creating level hypervector
+    chrono::time_point<chrono::system_clock> hvStart, hvEnd;
+    hvStart = chrono::system_clock::now();
     cout << "creating level hypervector..." << endl;
     
     lMin= *min_element(trainset_array[0].begin(),trainset_array[0].end());
@@ -231,6 +233,7 @@ int main()
     }
     cout << LD_test1<< endl;
     cout << LD_test2<< endl;
+    
     //printLinspace(LD[1]);
     //creating identity hypervector
     cout << "creating identity hypervector..." << endl;
@@ -253,13 +256,14 @@ int main()
         {
             ID_test=ID_test+ (ID[1][j]^ID[0][j]) ; //FIX ME: print out all 0s
         }
-        cout << ID_test<< endl;
-    time(&end_HV);
-    cout <<"Hypervector Creation time="<<end_HV-begin_HV<<"seconds"<<endl;
+    cout << ID_test<< endl;
+    hvEnd = chrono::system_clock::now();
+    chrono::duration<double> elapsedHV = hvEnd - hvStart;
+    cout <<"Hypervector Creation time="<<elapsedHV.count()<<"seconds"<<endl;
 
     //creating class hypervector
-    time_t begin_Train, end_Train;
-    time(&begin_Train);
+    chrono::time_point<chrono::system_clock> trainStart, trainEnd;
+    trainStart = chrono::system_clock::now();
     cout << "training: creating class hypervector..." << endl;
     CH = zeros(numClasses, D);
     vector<int>  sXorHV(D,0);
@@ -326,15 +330,16 @@ int main()
         cout << "checkPoint9.."<<endl;
         cout << "CH_test.."<< endl;
         cout << CH_test<< endl;
-        time(&end_Train);
-        cout <<"Training time="<<end_Train-begin_Train<<"seconds"<<endl;
+    trainEnd = chrono::system_clock::now();
+    chrono::duration<double> elapsedTrain = trainEnd - trainStart;
+        cout <<"Training time="<<elapsedTrain.count()<<"seconds"<<endl;
     
        
     //testing
+    chrono::time_point<chrono::system_clock> testStart, testEnd;
+    testStart = chrono::system_clock::now();
     cout << "testing..." << endl;
     
-    time_t begin_Test, end_Test;
-    time(&begin_Test);
 
     
     vector<int> predicted(numTestSamples); //predicted class vector
@@ -396,10 +401,12 @@ int main()
     }
     accuracy = (accuracy / numTestSamples)*100;
     cout << "accuracy: " << accuracy <<"%"<< endl;
-    
-    time(&end_Test);
-    cout <<"Testing time="<<end_Test-begin_Test<<"seconds"<<endl;
-    cout <<"Total Execution time="<<end_Test-begin_L<<"seconds"<<endl;
+    testEnd = chrono::system_clock::now();
+    end = chrono::system_clock::now();
+    chrono::duration<double> elapsedTest = testEnd - testStart;
+    chrono::duration<double> elapsedTotal = end - start;
+    cout <<"Testing time="<<elapsedTest.count()<<"seconds"<<endl;
+    cout <<"Total Execution time="<<elapsedTotal.count()<<"seconds"<<endl;
     
     return 0;
 }
