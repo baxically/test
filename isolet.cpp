@@ -24,6 +24,7 @@
 #include <iterator>
 #include <iterator>
 #include <time.h>
+#include <chrono>
 #include "stdc++.h"
 
 using namespace std;
@@ -38,7 +39,7 @@ vector<int> elementWiseMulti(vector<vector<int> > v1, vector<vector<int> > v2);
 
 int main()
 {
-    //auto start = chrono::steady_clock::now();
+    auto start = chrono::steady_clock::now();
     
     //variables
     string trainCSV = "isolet1+2+3+4.data";
@@ -175,7 +176,9 @@ int main()
     
     
     time(&end_L);
+    auto end = chrono::steady_clock::now();
     cout <<"loading time="<<end_L-begin_L<<"seconds"<<endl;
+    cout <<"loading time in secs ="<<chrono::duration_cast<chrono::seconds>(end-start).count()<<"seconds"<<endl;
     
     time_t begin_HV, end_HV;
     time(&begin_HV);
