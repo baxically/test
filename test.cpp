@@ -41,8 +41,8 @@ int main()
     //auto start = chrono::steady_clock::now();
     
     //variables
-    string trainCSV = "mnist_train.csv";
-    string testCSV = "mnist_test.csv";
+    string trainCSV = "isolet1+2+3+4.data";
+    string testCSV = "isolet5.data";
     string line = "";
     //int label;
     //int pixel;
@@ -53,10 +53,10 @@ int main()
     int nLevel = 0;
     int M = 11;
     int D = 10000;
-    int numTrainSamples = 60000;
-    int numTestSamples = 10000;
-    int numClasses = 10;
-    int numFeatures=784;
+    int numTrainSamples = 6238;
+    int numTestSamples = 1559;
+    int numClasses = 26;
+    int numFeatures=617;
     //int sampleLevel = 0;
     //int indexLevel = 0;
     int accuracy = 0;
@@ -65,16 +65,16 @@ int main()
     ifstream ftestin;
     ofstream fout;
     vector<vector<int> > trainset_array;
-    vector<int> trainset_labels(60001);
+    vector<int> trainset_labels(numTrainSamples + 1);
     vector<vector<int> > testset_array;
-    vector<int> testset_labels(10001);
-    vector<int> labels(10,0);
+    vector<int> testset_labels(numTestSamples + 1);
+    vector<int> labels(26,0);
     vector<vector<int> > LD;
     vector<vector<int> > ID;
     vector<vector<int> > CH;
     vector<vector<int> > sampleHV;
     vector<vector<int> > nOne;
-    vector<int> classes(60001);
+    vector<int> classes(numTrainSamples + 1);
     vector<int> L;
     vector<int> rowArray(numFeatures);
     vector<int> nAlter(D);
@@ -105,7 +105,7 @@ int main()
     cout << "loading data..." << endl;
     time_t begin_L, end_L;
     time(&begin_L); 
-    fin.open("mnist_train.csv");
+    fin.open("isolet1+2+3+4.data");
     if(!fin.is_open())
     {
         cout << "Error: Can't open " + trainCSV << endl;
@@ -120,16 +120,19 @@ int main()
                 break;
             }
             
-            fin >> trainset_labels.at(row);
-            //fin.ignore(50000000, '\n');
+            
             trainset_array.push_back(rowArray);
             
             for(int col = 0; col < numFeatures; col++)
             {
-                fin.ignore(50000000, ',');
+                
                 fin >> trainset_array[row][col];
-                //cout << trainset_array[row][col] << " ";
+                fin.ignore(50000000, ',');
+                fin.ignore();
+                cout << trainset_array[row][col] << " ";
             }
+            fin >> trainset_labels.at(row);
+            fin.ignore(50000000, ',');
             row++;
         }
     }
@@ -152,17 +155,19 @@ int main()
                 break;
             }
             
-            fin >> testset_labels.at(trow);
-            //cout<< "\n"<<testset_labels[trow] << endl;
-            //fin.ignore(50000000, '\n');
+            
             testset_array.push_back(rowArray);
             
             for(int col = 0; col < numFeatures; col++)
             {
-                fin.ignore(50000000, ',');
+                
                 fin >> testset_array[trow][col];
-                //cout<< testset_array[trow][col];
+                fin.ignore(50000000, ',');
+                fin.ignore();
+                cout<< testset_array[trow][col];
             }
+            fin >> testset_labels.at(row);
+            fin.ignore(50000000, ',');
             trow++;
         }
     }
