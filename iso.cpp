@@ -248,7 +248,7 @@ int main()
     int qcheck;
     int indMin=0;
     int i;
-    for(int iSam = 0; iSam < 1000; iSam++)
+    for(int iSam = 0; iSam < numTrainSamples; iSam++)
     {
         
         for(int jSam = 0; jSam < numFeatures; jSam++)
