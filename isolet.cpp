@@ -164,9 +164,9 @@ int main()
                 ftestin.ignore();
                 cout << testset_array[trow][col] << " ";
             }
-            ftestin >> testset_labels.at(row);
+            ftestin >> testset_labels.at(trow);
             ftestin.ignore(50000000, ',');
-            cout << "label: " << testset_labels.at(row) << endl;
+            cout << "label: " << testset_labels.at(trow) << endl;
             trow++;
         }
     }
