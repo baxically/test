@@ -275,7 +275,7 @@ cout << "here" << endl;
     int qcheck;
     int indMin=0;
     int i;
-    for(int iSam = 0; iSam < numTrainSamples + 1; iSam++)
+    for(int iSam = 0; iSam < 1000; iSam++)
     {
         
         for(int jSam = 0; jSam < numFeatures; jSam++)
@@ -301,7 +301,7 @@ cout << "here" << endl;
           sHV[jD]=int(sHV[jD] >= (numFeatures / 2));
         }
           
-        for(int k_ = 0; k_ < classes.size()-1; k_++)
+        for(int k_ = 0; k_ < classes.size(); k_++)
         {
             if(trainset_labels[iSam] == classes[k_])
             {
@@ -310,6 +310,7 @@ cout << "here" << endl;
                 break;
             }
         }
+//cout << classes.size() << endl;
         cout<<iSam<<endl;
     }
     
