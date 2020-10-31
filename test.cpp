@@ -59,7 +59,7 @@ int main()
     int numFeatures=617;
     //int sampleLevel = 0;
     //int indexLevel = 0;
-    int accuracy = 0;
+    double accuracy = 0;
     //char comma;
     ifstream fin;
     ifstream ftestin;
