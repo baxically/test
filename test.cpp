@@ -64,9 +64,9 @@ int main()
     ifstream fin;
     ifstream ftestin;
     ofstream fout;
-    vector<vector<int> > trainset_array;
+    vector<vector<double> > trainset_array;
     vector<int> trainset_labels(numTrainSamples + 1);
-    vector<vector<int> > testset_array;
+    vector<vector<double> > testset_array;
     vector<int> testset_labels(numTestSamples + 1);
     vector<int> labels(26,0);
     vector<vector<int> > LD;
@@ -76,7 +76,7 @@ int main()
     vector<vector<int> > nOne;
     vector<int> classes(numTrainSamples + 1);
     vector<int> L;
-    vector<int> rowArray(numFeatures);
+    vector<double> rowArray(numFeatures);
     vector<int> nAlter(D);
     vector<vector<int> > quantLevel;
     vector<vector<int> > quant;
@@ -120,7 +120,7 @@ int main()
                 break;
             }
             
-            
+            	        
             trainset_array.push_back(rowArray);
             
             for(int col = 0; col < numFeatures; col++)
@@ -129,27 +129,30 @@ int main()
                 fin >> trainset_array[row][col];
                 fin.ignore(50000000, ',');
                 fin.ignore();
-                cout << trainset_array[row][col] << " ";
+               // cout << trainset_array[row][col] << " ";
             }
             fin >> trainset_labels.at(row);
             fin.ignore(50000000, ',');
             row++;
+	
         }
     }
     fin.close();
-    
+   //cout << "out of range here?" << endl; 
     int trow = 0;
-    cout<< "loading test data "<<endl;
-    fin.open("mnist_test.csv");
-    if(!fin.is_open())
+    //cout<< "loading test data "<<endl;
+    ftestin.open("isolet5.data");
+//	cout << "errpr" << endl;
+    if(!ftestin.is_open())
     {
         cout << "Error: Can't open " + testCSV << endl;
     }
     else
     {
-        while(!fin.eof())
+        while(!ftestin.eof())
         {
-            
+
+//	cout << "entered while" << endl;            
             if(trow > numTestSamples)
             {
                 break;
@@ -161,17 +164,18 @@ int main()
             for(int col = 0; col < numFeatures; col++)
             {
                 
-                fin >> testset_array[trow][col];
-                fin.ignore(50000000, ',');
-                fin.ignore();
-                cout<< testset_array[trow][col];
+                ftestin >> testset_array[trow][col];
+                ftestin.ignore(50000000, ',');
+                ftestin.ignore();
+               //cout<< testset_array[trow][col];
             }
-            fin >> testset_labels.at(row);
-            fin.ignore(50000000, ',');
+            ftestin >> testset_labels.at(trow);
+            ftestin.ignore(50000000, ',');
             trow++;
         }
     }
-    fin.close();
+cout << "here" << endl;
+    ftestin.close();
 
     
     
@@ -271,7 +275,7 @@ int main()
     int qcheck;
     int indMin=0;
     int i;
-    for(int iSam = 0; iSam < numTrainSamples; iSam++)
+    for(int iSam = 0; iSam < numTrainSamples + 1; iSam++)
     {
         
         for(int jSam = 0; jSam < numFeatures; jSam++)
@@ -297,7 +301,7 @@ int main()
           sHV[jD]=int(sHV[jD] >= (numFeatures / 2));
         }
           
-        for(int k_ = 0; k_ < classes.size(); k_++)
+        for(int k_ = 0; k_ < classes.size()-1; k_++)
         {
             if(trainset_labels[iSam] == classes[k_])
             {
