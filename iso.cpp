@@ -21,15 +21,15 @@
 #include <time.h>
 #include <cmath>
 #include <functional>
-#include <iterator>
+#include <iterator> 
 #include <iterator>
 #include <time.h>
 #include "stdc++.h"
 
 using namespace std;
 
-vector<int> linspace(int start_in, int end_in, int num_in);
-void printLinspace(vector<int> v);
+vector<float> linspace(float start_in, float end_in, int num_in);
+void printLinspace(vector<float> v);
 vector<vector<int> > zeros(int row, int col);
 vector<vector<int> > ones(int row, int col);
 int getNum(vector<int> vec);
@@ -38,57 +38,87 @@ vector<int> elementWiseMulti(vector<vector<int> > v1, vector<vector<int> > v2);
 
 int main()
 {
+    //auto start = chrono::steady_clock::now();
     
     //variables
     string trainCSV = "isolet1+2+3+4.data";
     string testCSV = "isolet5.data";
     string line = "";
+    //int label;
+    //int pixel;
     int row = 0;
-    int lMax = 0;
-    int lMin = 0;
-    int dL = 0;
+    float lMax = 0;
+    float lMin = 0;
+    float dL = 0;
     int nLevel = 0;
     int M = 11;
     int D = 10000;
-    int numTrainSamples = 6238;
-    int numTestSamples = 1559;
-    int numClasses = 26;
-    int numFeatures=617;
-    double accuracy = 0;
     
+    
+    
+    int numClasses=26;
+    int numTrainSamples=6238;
+	  int numTestSamples=1559;
+	  int numFeatures=617;
+    
+    
+    
+    //int sampleLevel = 0;
+    //int indexLevel = 0;
+    float accuracy = 0;
+    //char comma;
     ifstream fin;
     ifstream ftestin;
     ofstream fout;
-    
-    vector<vector<double> > trainset_array;
-    vector<int> trainset_labels(numTrainSamples + 1);
-    vector<vector<double> > testset_array;
-    vector<int> testset_labels(numTestSamples + 1);
-    vector<int> labels(26,0);
+    vector<vector<float> > trainset_array;
+    vector<int> trainset_labels(numTrainSamples+1);
+    vector<vector<float> > testset_array;
+    vector<int> testset_labels(numTestSamples+1);
+    vector<int> labels(numClasses,0);
     vector<vector<int> > LD;
     vector<vector<int> > ID;
     vector<vector<int> > CH;
+    vector<int> sHV(D,0);
+    vector<int> qHV(D,0);
     vector<vector<int> > sampleHV;
     vector<vector<int> > nOne;
-    vector<int> classes(numTrainSamples + 1);
-    vector<int> L;
-    vector<double> rowArray(numFeatures);
+    vector<float> L;
+    vector<float> rowArray(numFeatures);
     vector<int> nAlter(D);
     vector<vector<int> > quantLevel;
     vector<vector<int> > quant;
     vector<vector<int> > classHV;
 
+    
+    
+//    //testing to see if i can read the csv file
+//    fin.open(trainCSV);
+//
+//    if(!fin.is_open())
+//    {
+//        cout << "Error: Can't open " + trainCSV << endl;
+//    }
+//
+//    for(int i = 0; i < 1; i++)
+//    {
+//        if(fin >> label)
+//        {
+//            cout << label << endl;
+//        }
+//    }
+    
     //loading data
+    //CSV Format: label, pix-11, pix-12, pix-13, ...
     cout << "loading data..." << endl;
     time_t begin_L, end_L;
-    time(&begin_L);
+    time(&begin_L); 
     fin.open("isolet1+2+3+4.data");
     if(!fin.is_open())
     {
-        cout << "Error: Can't open " + trainCSV << endl;
+        printf("Error: Can't open file containind training X dataset");
     }
     else
-    {
+    {	printf("\nloading train data..\n");
         while(!fin.eof())
         {
             
@@ -97,57 +127,65 @@ int main()
                 break;
             }
             
-                        
             trainset_array.push_back(rowArray);
-            
-            for(int col = 0; col < numFeatures; col++)
+			
+            for(int col = 0; col < numFeatures ; ++col)
             {
                 
+                
                 fin >> trainset_array[row][col];
+				        trainset_array[row][col]=trainset_array[row][col]*100;
                 fin.ignore(50000000, ',');
-                fin.ignore();
-               // cout << trainset_array[row][col] << " ";
+				        fin.ignore();
+				        //printf("\t%f",trainset_array[row][col]);
+
             }
-            fin >> trainset_labels.at(row);
-            fin.ignore(50000000, ',');
+            fin >> trainset_labels[row];
+            fin.ignore(50000000, '.');
+            //printf("\nlabel:%d\n",trainset_labels[row]);
             row++;
-    
-        }
+        }  
     }
-    fin.close();
-    int trow = 0;
-    //cout<< "loading test data "<<endl;
-    ftestin.open("isolet5.data");
+	  fin.close();
+	
+	  row=0;
+	  ftestin.open("isolet5.data");
     if(!ftestin.is_open())
     {
-        cout << "Error: Can't open " + testCSV << endl;
+        printf("Error: Can't open file containind training X dataset");
     }
     else
-    {
+    {	printf("\nloading test data..\n");
         while(!ftestin.eof())
-        {
-            if(trow > numTestSamples)
+        {          
+            if(row > numTestSamples)
             {
                 break;
             }
             
-            
             testset_array.push_back(rowArray);
-            
-            for(int col = 0; col < numFeatures; col++)
+			
+            for(int col = 0; col < numFeatures ; ++col)
             {
                 
-                ftestin >> testset_array[trow][col];
+                
+                ftestin >> testset_array[row][col];
+				        testset_array[row][col]=testset_array[row][col]*100;
                 ftestin.ignore(50000000, ',');
                 ftestin.ignore();
-               //cout << testset_array[trow][col];
+                //printf("\t%f", testset_array[row][col]);
             }
-            ftestin >> testset_labels.at(trow);
-            ftestin.ignore(50000000, ',');
-            trow++;
+            ftestin >> testset_labels.at(row);
+            ftestin.ignore(50000000, '.');
+            
+            //printf("\nlabel: %d\n", testset_labels.at(row));
+            row++;
         }
     }
-    ftestin.close();
+	  ftestin.close();
+   
+     for (int i=0; i < numTrainSamples; i++) { trainset_labels[i] = trainset_labels[i]-1; }
+     for (int i=0; i < numTestSamples; i++) { testset_labels[i] = testset_labels[i]-1; }
 
     
     
@@ -156,8 +194,7 @@ int main()
     
     time_t begin_HV, end_HV;
     time(&begin_HV);
-    
-    //creating level hypervector
+        //creating level hypervector
     cout << "creating level hypervector..." << endl;
     
     lMin= *min_element(trainset_array[0].begin(),trainset_array[0].end());
@@ -194,11 +231,11 @@ int main()
         for(int k_ = 0; k_ <numAlter; k_++)
         {
           kalter = nAlter[(i_ - 1)*numAlter + k_];
-          LD[i_][kalter]=int(LD[i_][kalter]==0);
+          LD[i_][kalter]=int(LD[i_][kalter]==0);         
         }
     }
     
-    //test to see if LD is being populated properly;
+        //test to see if ID is being populated properly;
     
     int LD_test1=0;
     int LD_test2=0;
@@ -212,7 +249,6 @@ int main()
     //printLinspace(LD[1]);
     //creating identity hypervector
     cout << "creating identity hypervector..." << endl;
-    numFeatures = static_cast<int>(trainset_array.at(0).size());
     //cout << numFeatures << endl;
     ID = zeros(numFeatures, D);
 
@@ -227,12 +263,12 @@ int main()
     
     //test to see if ID is being populated properly;
     
-        int ID_test=0;
-        for(int j = 0; j < ID[0].size(); j++)
-        {
-            ID_test=ID_test+ (ID[1][j]^ID[0][j]) ; //FIX ME: print out all 0s
-        }
-        cout << ID_test<< endl;
+    int ID_test=0;
+    for(int j = 0; j < ID[0].size(); j++)
+    {
+      ID_test=ID_test+ (ID[1][j]^ID[0][j]) ; //FIX ME: print out all 0s
+    }
+    cout << ID_test<< endl;
     time(&end_HV);
     cout <<"Hypervector Creation time="<<end_HV-begin_HV<<"seconds"<<endl;
 
@@ -241,51 +277,48 @@ int main()
     time(&begin_Train);
     cout << "training: creating class hypervector..." << endl;
     CH = zeros(numClasses, D);
-    vector<int>  sHV(D,0);
     vector<int>  sXorHV(D,0);
     vector<vector<int> > qOnes = ones(1, nLevel);
-    int quantMin;
-    int qcheck;
+    float quantMin;
+    float qcheck;
     int indMin=0;
-    int i;
     for(int iSam = 0; iSam < numTrainSamples; iSam++)
     {
-        
+        for (int jSam=0; jSam<D; jSam++)
+        {
+          sHV[jSam]=0;
+        }
         for(int jSam = 0; jSam < numFeatures; jSam++)
         {
             indMin=0;
             quantMin = abs(trainset_array[iSam][jSam]-L[0]);
-            for (i=1; i<M;i++)
-            {
+            for (int i=1; i<M;i++)
+            { 
               qcheck=abs(trainset_array[iSam][jSam]-L[i]);
               if (quantMin > qcheck)
               {
                 quantMin=qcheck;
                 indMin=i;
               }
-            }
+            }   
                    
             transform(LD[indMin].begin(), LD[indMin].end(), ID[jSam].begin(), sXorHV.begin(), bit_xor<int>());
             transform (sHV.begin(), sHV.end(), sXorHV.begin(), sHV.begin(), plus<int>());
         }
          
-        for(int jD = 0; jD < D; jD++)
+        for(int jD = 0; jD < D; jD++)   
         {
           sHV[jD]=int(sHV[jD] >= (numFeatures / 2));
         }
           
-        for(int k_ = 0; k_ < classes.size(); k_++)
-        {
-            if(trainset_labels[iSam] == classes[k_])
-            {
-                transform (CH[k_].begin(), CH[k_].end(), sHV.begin(), CH[k_].begin(), plus<int>());
-                labels.at(k_)=labels.at(k_)+1;
-                break;
-            }
-        }
+        int k_=trainset_labels[iSam];
+        transform (CH[k_].begin(), CH[k_].end(), sHV.begin(), CH[k_].begin(), plus<int>());
+        labels.at(k_)=labels.at(k_)+1;
+        
         cout<<iSam<<endl;
     }
     
+    //TASK: understand this syntax
     
     classHV = zeros(numClasses, D);
     for(int ind = 0; ind < numClasses; ind++)
@@ -321,18 +354,21 @@ int main()
     
     vector<int> predicted(numTestSamples); //predicted class vector
     
-    vector<int>  qHV(D,0);
     vector<int>  qXorHV(D,0);
     vector<int>  qResult(numClasses,0);
     
-    for(int iTest = 0; iTest < 500; iTest++)
+    for(int iTest = 0; iTest < numTestSamples; iTest++)
     {
+        for (int jTest=0; jTest<D; jTest++)
+        {
+          qHV[jTest]=0;
+        }
         for(int jTest = 0; jTest < numFeatures; jTest++)
         {
             indMin=0;
             quantMin = abs(testset_array[iTest][jTest]-L[0]);
-            for (i=1; i<M;i++)
-            {
+            for (int i=1; i<M;i++)
+            { 
               qcheck=abs(testset_array[iTest][jTest]-L[i]);
               if (quantMin > qcheck)
               {
@@ -347,9 +383,9 @@ int main()
             transform (qHV.begin(), qHV.end(), qXorHV.begin(), qHV.begin(), plus<int>());
         }
          
-        for(int jD = 0; jD < D; jD++)
+        for(int jD = 0; jD < D; jD++)   
         {
-          qHV[jD]=int(qHV[jD] >= (numFeatures / 2));
+          qHV[jD]=int(qHV[jD] >= (numFeatures / 2)); 
         }
         int testIndex = 0;
         transform(qHV.begin(), qHV.end(), classHV[0].begin(), qXorHV.begin(), bit_xor<int>());
@@ -363,9 +399,9 @@ int main()
             {
               testIndex = c;
               minResult=qResult[c];
-            }
+            }    
         }
-        predicted[iTest] = classes.at(testIndex);
+        predicted[iTest] = testIndex;
         if(predicted[iTest] == testset_labels[iTest])
         {
           accuracy =accuracy+ 1;
@@ -380,15 +416,15 @@ int main()
     cout <<"Testing time="<<end_Test-begin_Test<<"seconds"<<endl;
     cout <<"Total Execution time="<<end_Test-begin_L<<"seconds"<<endl;
     
-    return 0;
+    return 0;  
 }
     
-vector<int> linspace(int start_in, int end_in, int num_in)
+vector<float> linspace(float start_in, float end_in, int num_in)
 {
-    vector<int> linspaced;
+    vector<float> linspaced;
     
-    int start = start_in;
-    int end = end_in;
+    float start = start_in;
+    float end = end_in;
     int num = num_in;
     
     if(num == 0)
@@ -402,7 +438,7 @@ vector<int> linspace(int start_in, int end_in, int num_in)
         return linspaced;
     }
     
-    int delta = (end - start) / (num - 1);
+    float delta = (end - start) / (num - 1);
     
     for(int i = 0; i < num - 1; i++)
     {
@@ -414,7 +450,7 @@ vector<int> linspace(int start_in, int end_in, int num_in)
     return linspaced;
 }
 
-void printLinspace(vector<int> v)
+void printLinspace(vector<float> v)
 {
     cout << "size: " << v.size() << endl;
     for(int i=0; i< v.size(); i++)
@@ -464,3 +500,4 @@ vector<int> randperm(int num)
     
     return v;
 }
+
